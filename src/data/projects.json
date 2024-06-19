@@ -1,0 +1,27 @@
+[
+    {
+        "name" : "Digital payment solutions",
+        "description" : "Developed and Designed a web and mobile application to tackle overcharing by operators at Aadhar Seva Kendra. Technology Used: Django/Python, React, MySQL, Firebase, Cashfree API, Twilio",
+        "link" : "https://docs.google.com/presentation/d/13QDaErDe_VYwToPoovlh6ITGaRuPP7XQCofeIpJNAv8/edit?usp=sharing"
+    },
+    {
+        "name" : "Golang with React",
+        "description" : "In this project, I built a CRUD application using Golang, MySQL, and React. The backend will be an API in Golang, and the frontend will be implemented in React.",
+        "link" : "https://github.com/Keerthan22-sys/Golang-with-React"
+    },
+    {
+        "name" : "Gatsby and GraphQL",
+        "description" : "In this project, I built a digital library application using Gatsby and GraphQL. We'll work with GraphQL to fetch data from a JSON file, and use it in our web applications. We'll have a fully functional digital library application with Gatsby links to demonstrate the lightning-fast speed of the framework.",
+        "link" : "https://github.com/Keerthan22-sys/Gatsby-and-GraphQL"
+    },
+    {
+        "name" : "Women Safety Application",
+        "description" : "In this project, an android based smartphone with an integrated feature that alerts and provides location-based information. It provides self-defence and SMS alerts when a woman is in danger. It sends the alert message with Global positioning system(GPS) location to emergency contacts.",
+        "link" : "https://github.com/Keerthan22-sys/Women-Safety-Application"
+    },
+    {
+        "name" : "Inventory Management System",
+        "description" : "The main aim of Inventory management system is to make an easy interface for the admin to manage the warehouse effective and efficiently.",
+        "link" : "https://github.com/Keerthan22-sys/Inventory-Management-System"
+    }
+]
