@@ -15,14 +15,6 @@ const Skills = () => {
             "icon" : FaJs
         },
         {
-            "name" : "HTML",
-            "icon" : FaHtml5
-        },
-        {
-            "name" : "CSS",
-            "icon" : FaCss3
-        },
-        {
             "name" : "React",
             "icon" : FaReact
         },
