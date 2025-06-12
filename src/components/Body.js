@@ -16,7 +16,7 @@ const Body = () => {
                     <div className="body-icons">
                         <a href="https://github.com/Keerthan22-sys" target="_blank" rel="noreferrer" className="icon-link"><i><FaGithub /></i> </a>
                         <a href="https://www.linkedin.com/in/keerthangowdas/" target="_blank" rel="noreferrer" className="icon-link"><i><FaLinkedin /></i></a>
-                        <a href="https://drive.google.com/file/d/1Zdnr-GXq3QtGrgHNXQ8-ZfnWtyIdGqRC/view?usp=sharing" target="_blank" rel="noreferrer" className="icon-link"><i><FaGoogleDrive /></i></a>
+                        <a href="https://drive.google.com/file/d/1lYbQ3ogl6vHCnDg-Gi_E9y2Id1aJwmFF/view?usp=sharing" target="_blank" rel="noreferrer" className="icon-link"><i><FaGoogleDrive /></i></a>
                     </div>
                 </div>
             </div>
