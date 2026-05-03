@@ -1,27 +1,47 @@
-import { FaGoogleDrive, FaGithub, FaLinkedin } from "react-icons/fa";
-import Avatar from '../assets/Software.jpg';
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { HiArrowRight } from "react-icons/hi";
 
 const Body = () => {
     return (
-        <div id="body" className="body">
+        <section id="body" className="body">
             <div className="body-container">
-                <div className="body-profile">
-                    <img className="body-img" alt='avatar' src={Avatar} />
-
-                    <div className="body-content">
-                        <div className="body-headline">Keerthan Gowda S</div>
-                        <div className="body-text">Software Engineer</div>
-                    </div>
-
-                    <div className="body-icons">
-                        <a href="https://github.com/Keerthan22-sys" target="_blank" rel="noreferrer" className="icon-link"><i><FaGithub /></i> </a>
-                        <a href="https://www.linkedin.com/in/keerthangowdas/" target="_blank" rel="noreferrer" className="icon-link"><i><FaLinkedin /></i></a>
-                        <a href="https://drive.google.com/file/d/1-B4gDczdilOime3sYFMKa2Rfi64v5yQ1/view?usp=sharing" target="_blank" rel="noreferrer" className="icon-link"><i><FaGoogleDrive /></i></a>
-                    </div>
+                <div className="body-label">Available for opportunities</div>
+                <h1 className="body-headline">Keerthan Gowda S</h1>
+                <div className="body-role">AI Engineer</div>
+                <p className="body-tagline">
+                    Building intelligent systems at the intersection of machine learning,
+                    infrastructure, and product. Focused on turning research into reliable,
+                    scalable AI applications.
+                </p>
+                <div className="body-icons">
+                    <a
+                        href="https://drive.google.com/file/d/1ohGKAOheMgqnuN7OJJnG8J6uSeQQIopJ/view?usp=sharing"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="icon-link primary"
+                    >
+                        Resume <HiArrowRight />
+                    </a>
+                    <a
+                        href="https://github.com/Keerthan22-sys"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="icon-link"
+                    >
+                        <FaGithub /> GitHub
+                    </a>
+                    <a
+                        href="https://www.linkedin.com/in/keerthangowdas/"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="icon-link"
+                    >
+                        <FaLinkedin /> LinkedIn
+                    </a>
                 </div>
             </div>
-        </div>
-    )
-}
+        </section>
+    );
+};
 
 export default Body;

@@ -1,16 +1,17 @@
 const Header = () => {
     return (
-        <div className="header">
-                <div className="header-logo">
-                    <a href="#app"><h3 className="header-name">KEERTHAN GOWDA S</h3></a>
-                </div>
-                <div className="header-container">
-                    <div className="nav-item"><a href="#about">About</a></div>
-                    <div className="nav-item"><a href="#projects">Projects</a></div>
-                    <div className="nav-item"><a href="#skills">Skills</a></div>
-                </div>
-        </div>
-    )
-}
+        <header className="header">
+            <div className="header-logo">
+                <a href="#app">kg.</a>
+            </div>
+            <nav className="header-container">
+                <div className="nav-item"><a href="#about">about</a></div>
+                <div className="nav-item"><a href="#projects">projects</a></div>
+                <div className="nav-item"><a href="#skills">skills</a></div>
+                <div className="nav-item"><a href="#footer">contact</a></div>
+            </nav>
+        </header>
+    );
+};
 
 export default Header;
