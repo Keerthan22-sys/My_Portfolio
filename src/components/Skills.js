@@ -1,67 +1,37 @@
-import { FaLinux, FaAndroid, FaFigma, FaJava, FaAws, FaPython, FaJs, FaReact, FaHtml5, FaCss3, FaGithub, FaDocker } from "react-icons/fa";
-
 const Skills = () => {
-    const skillsArr = [
+    const categories = [
         {
-            "name" : 'Python',
-            "icon" : FaPython
+            label: "Languages",
+            skills: ["Python", "JavaScript", "TypeScript", "Java", "Go", "SQL"]
         },
         {
-            "name" : 'Java',
-            "icon" : FaJava
+            label: "AI / ML",
+            skills: ["PyTorch", "TensorFlow", "HuggingFace", "LangChain", "scikit-learn", "OpenCV", "RAG", "LLM Fine-tuning"]
         },
         {
-            "name" : 'JavaScript',
-            "icon" : FaJs
-        },
-        {
-            "name" : "React",
-            "icon" : FaReact
-        },
-        {
-            "name" : "Android",
-            "icon" : FaAndroid
-        },
-        {
-            "name" : "Git",
-            "icon" : FaGithub
-        },
-        {
-            "name" : "AWS",
-            "icon" : FaAws
-        },
-        {
-            "name" : "Docker",
-            "icon" : FaDocker
-        },
-        {
-            "name" : "Linux",
-            "icon" : FaLinux
+            label: "Infrastructure",
+            skills: ["AWS", "Docker", "Linux", "Git", "FastAPI", "Django", "React"]
         }
     ];
 
     return (
-        <div id='skills' className='skills'>
-            <h2 className='title'>Skills</h2>
-            <div className='skill-holder'>
-                {
-                    skillsArr.map((skill, index) => {
-                        const Icon = skill.icon;
-                        return (
-                            <i key={index} className='skill-cards'>
-                                <Icon className='skill-icon'/>
-                                <p
-                                className="skill"
-                                >
-                                    {skill.name}
-                                </p>
-                            </i>
-                        )
-                    })                    
-                }
+        <section id="skills" className="skills section">
+            <div className="section-label">Expertise</div>
+            <h2 className="section-title">Skills</h2>
+            <div className="skills-categories">
+                {categories.map((cat) => (
+                    <div key={cat.label}>
+                        <div className="skill-category-label">{cat.label}</div>
+                        <div className="skill-tags">
+                            {cat.skills.map((s) => (
+                                <span key={s} className="skill-tag">{s}</span>
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
-        </div>
-    )
-}
+        </section>
+    );
+};
 
 export default Skills;

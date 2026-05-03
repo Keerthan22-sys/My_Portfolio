@@ -1,38 +1,44 @@
-import IMG from '../assets/Keerthan.jpg';
-
 const About = () => {
     return (
-        <div id="about" className="about">
-            <h1 className="about-heading">About Me</h1>
-            <div className="about-info">
-                <p className="about-desc">
-                    <li>
-                    Technology Enthusiast and Aspiring Enterpreneur with <strong>Enterpreneurial mindset</strong> 
-                    </li>
-                    <li>
-                    <strong>Award-Winning Innovator:</strong> Led my team to secure a <b>top 20 finish out of 625 teams</b> in a prestigious business plan competition by FKCCI Manthan. Won the <strong>Smart India Hackathon 2022</strong> with a digital payment solution for Aadhar Seva Kendra.
-                    </li>
-                    <li>
-                    <strong>Accomplished Academic Background:</strong> Achieved an impressive AIR of 5469 in the <strong>National Engineering Olympiad.</strong> Recognized with a Rs. 50,000 scholarship from <b>Marubeni India</b> for academic excellence.
-                    </li>
-                   {/* <li>
-                    <strong>Research and Technical Expertise:</strong> Presented a research paper on <b>Edge Computing</b> listed in college proceedings. Proficient in SQL, Cloud Computing, Apex programming, and embedded systems development with <b>STMicroelectronics and Texas Instruments.</b>
-                    </li>
-                    <li> 
-                    <strong>Leadership and Team Collaboration:</strong> Successfully led teams as a <b>Team Leader</b> and volunteered extensively with NSS, demonstrating strong leadership, communication, and coordination skills.
-                    </li>
-                    <li>
-                    <strong>Technical Skills and Project Management:</strong> <b>Developed</b> Salesforce applications, optimized scanner drivers, and <b>designed</b> LCD interfaces, ensuring high-quality deliverables through effective <b>API integration</b> and client-focused <b>project management.</b>
-                    </li> */}
-                </p>
-                <div className="about-img">
-                  {/*  <div className="about-img-wrapper">
-                        <img src={IMG} alt="Detective" />
-                    </div>  */}
+        <section id="about" className="about section">
+            <div className="section-label">Background</div>
+            <h2 className="section-title">About Me</h2>
+            <div className="about-body">
+                <div className="about-text">
+                    <p>
+                        I'm an AI Engineer passionate about building intelligent systems
+                        that solve real-world problems. My work spans the full ML lifecycle —
+                        from research and experimentation to deployment and monitoring in
+                        production environments.
+                    </p>
+                    <p>
+                        With a strong foundation in <strong>Python, deep learning frameworks,
+                        and cloud infrastructure</strong>, I focus on creating AI applications
+                        that are reliable, interpretable, and genuinely useful.
+                    </p>
+                    <p>
+                        Outside of engineering, I think deeply about the entrepreneurial
+                        side of AI — how intelligent products create value and what it
+                        takes to build them at scale.
+                    </p>
+                </div>
+                <div className="about-highlights">
+                    <div className="highlight-card">
+                        <h4>Smart India Hackathon 2022 — Winner</h4>
+                        <p>Built a digital payment solution for Aadhar Seva Kendra that won nationally.</p>
+                    </div>
+                    <div className="highlight-card">
+                        <h4>FKCCI Manthan — Top 20 / 625 Teams</h4>
+                        <p>Led a team to a top-20 finish in a prestigious national business plan competition.</p>
+                    </div>
+                    <div className="highlight-card">
+                        <h4>National Engineering Olympiad — AIR 5469</h4>
+                        <p>Achieved an all-India rank and recognized with a scholarship from Marubeni India.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    )
-}
+        </section>
+    );
+};
 
 export default About;
