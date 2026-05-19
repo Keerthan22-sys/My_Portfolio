@@ -15,7 +15,7 @@ const Body = () => {
                 </p>
                 <div className="body-icons">
                     <a
-                        href="https://drive.google.com/file/d/1ohGKAOheMgqnuN7OJJnG8J6uSeQQIopJ/view?usp=sharing"
+                        href="https://drive.google.com/file/d/1Fo_ODA66Xve9WBEUFX7SfZTsESMSBpNa/view?usp=sharing"
                         target="_blank"
                         rel="noreferrer"
                         className="icon-link primary"
