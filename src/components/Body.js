@@ -20,7 +20,7 @@ const Body = () => {
                         rel="noreferrer"
                         className="icon-link primary"
                     >
-                        Resume <HiArrowRight />
+                        Resume22 <HiArrowRight />
                     </a>
                     <a
                         href="https://github.com/Keerthan22-sys"
