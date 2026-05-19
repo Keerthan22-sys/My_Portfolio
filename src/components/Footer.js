@@ -40,7 +40,7 @@ const Footer = () => {
                             <FaTwitter /> @keerthangowdas1
                         </a>
                         <a
-                            href="https://drive.google.com/file/d/1ohGKAOheMgqnuN7OJJnG8J6uSeQQIopJ/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1Fo_ODA66Xve9WBEUFX7SfZTsESMSBpNa/view?usp=sharing"
                             target="_blank"
                             rel="noreferrer"
                         >
@@ -51,7 +51,7 @@ const Footer = () => {
 
                 <div className="footer-bottom">
                     <span className="footer-copy">
-                        © 2025 Keerthan Gowda S
+                        © 2026 Keerthan Gowda S
                     </span>
                     <span className="footer-made">
                         Built with React · Deployed on Vercel
