@@ -2,7 +2,7 @@ const Header = () => {
     return (
         <nav className="nav" role="navigation" aria-label="Main navigation">
             <div className="nav-inner">
-                <a href="#app" className="nav-logo">KS</a>
+                <a href="#app" className="nav-logo">Keerthan Gowda S</a>
                 <ul className="nav-links">
                     <li><a href="#about">About</a></li>
                     <li><a href="#projects">Work</a></li>
