@@ -54,7 +54,7 @@ const Footer = () => {
                         © 2026 Keerthan Gowda S
                     </span>
                     <span className="footer-made">
-                        Built with React · Deployed on Vercel
+                        Innovating and Impacting businesses scale...
                     </span>
                 </div>
             </div>
