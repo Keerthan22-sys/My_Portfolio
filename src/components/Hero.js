@@ -24,7 +24,7 @@ const Hero = () => {
 
                 <div className="hero-ctas">
                     <a
-                        href="https://drive.google.com/file/d/1ohGKAOheMgqnuN7OJJnG8J6uSeQQIopJ/view?usp=sharing"
+                        href="https://drive.google.com/file/d/1Fo_ODA66Xve9WBEUFX7SfZTsESMSBpNa/view?usp=drive_link"
                         target="_blank"
                         rel="noreferrer"
                         className="btn btn-primary"
