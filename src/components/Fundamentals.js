@@ -30,6 +30,20 @@ const items = [
         desc: 'Custom AI agent built from scratch — not wrapped around LangChain. Bare-metal tool-calling, memory, and planning loop to understand what frameworks are actually doing.',
         link: 'https://github.com/Keerthan22-sys/kilo-agent',
     },
+    {
+        num: '05',
+        name: 'Fault-Tolerant Web Hosting on Kubernetes',
+        author: 'Original build',
+        desc: 'Self-healing, auto-scaling web hosting on K8s — restartPolicy, replica sets, NGINX Ingress Controller. Kill a pod, watch it resurrect in seconds.',
+        link: 'https://github.com/Keerthan22-sys/fault-tolerant-web-hosting-on-kubernetess',
+    },
+    {
+        num: '06',
+        name: 'Ruby on Rails on Kubernetes',
+        author: 'Original build',
+        desc: 'Full two-tier microservices deployment — Rails frontend + PostgreSQL backend wired via Service discovery and ConfigMaps. No hardcoded IPs.',
+        link: 'https://github.com/Keerthan22-sys/Ruby-on-Rails-over-Kubernetss',
+    },
 ];
 
 const Fundamentals = () => {
@@ -40,11 +54,11 @@ const Fundamentals = () => {
                 <h2 className="section-title">Under the hood</h2>
 
                 <p className="fundamentals-intro">
-                    Most engineers use AI as a black box. I don't. Before reaching for a
-                    framework, I implement the underlying concept from scratch —
-                    <strong> autograd, tokenization, attention, agent loops</strong>.
-                    This is what lets me debug, optimise, and push beyond what the
-                    tutorial shows.
+                    Most engineers use AI and infrastructure as a black box. I don't. Before
+                    reaching for a framework, I implement the underlying concept from
+                    scratch — <strong>autograd, tokenization, attention, agent loops,
+                    container orchestration</strong>. This is what lets me debug, optimise,
+                    and push beyond what the tutorial shows.
                 </p>
 
                 <div className="fundamentals-grid">

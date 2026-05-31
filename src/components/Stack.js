@@ -8,6 +8,8 @@ const categories = [
             'CrewAI',
             'HuggingFace Transformers',
             'OpenAI API',
+            'Unsloth / QLoRA',
+            'DPO Alignment',
             'Streamlit',
             'scikit-learn',
         ],
@@ -51,6 +53,7 @@ const categories = [
         items: [
             'AWS',
             'Docker',
+            'Kubernetes',
             'Linux',
             'Git / GitHub',
             'Firebase',

@@ -5,6 +5,7 @@ import About from './components/About';
 import Projects from './components/Projects';
 import Fundamentals from './components/Fundamentals';
 import Stack from './components/Stack';
+import Blog from './components/Blog';
 import Footer from './components/Footer';
 
 const App = () => {
@@ -17,6 +18,7 @@ const App = () => {
         <Projects />
         <Fundamentals />
         <Stack />
+        <Blog />
       </main>
       <Footer />
     </div>
