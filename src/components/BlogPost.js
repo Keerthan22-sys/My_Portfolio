@@ -110,6 +110,32 @@ const BlogPost = () => {
                             ))}
                         </div>
                     )}
+
+                    {/* Resources */}
+                    {post.resources && (
+                        <div className="blog-resources">
+                            <div className="blog-resources-title">Resources & Further Reading</div>
+                            {post.resources.map((cat) => (
+                                <div key={cat.category} className="blog-resources-category">
+                                    <div className="blog-resources-cat-name">{cat.category}</div>
+                                    <ul className="blog-resources-list">
+                                        {cat.items.map((item) => (
+                                            <li key={item.name} className="blog-resource-item">
+                                                <span>
+                                                    <a href={item.url} target="_blank" rel="noreferrer">
+                                                        {item.name}
+                                                    </a>
+                                                    {item.note && (
+                                                        <span className="blog-resource-note"> — {item.note}</span>
+                                                    )}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </article>
 
                 {/* Bottom back link */}
