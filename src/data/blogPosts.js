@@ -1,5 +1,389 @@
 const blogPosts = [
     {
+        slug: 'multi-agent-ai-system-synapse',
+        title: 'I Built a Multi-Agent AI System — 11 Services, One Newsroom Architecture',
+        date: 'June 2026',
+        readTime: '16 min read',
+        tags: ['Multi-Agent', 'MCP', 'A2A', 'Observability', 'Kubernetes'],
+        excerpt: 'A 10-day build called SYNAPSE — eight MCP tool servers and three coordinating agents that collaborate over standardized protocols to generate context-aware article briefs. Covers MCP, agent-to-agent messaging, persistent memory, distributed tracing, self-critique loops, graceful degradation, and the road to Kubernetes.',
+        content: [
+            {
+                type: 'intro',
+                text: 'After a few weeks spent fine-tuning a single LLM into a domain expert, a different question started bothering me: what happens when you stop trying to make one model do everything and instead make several specialized agents work together? That turned into a 10-day build I called SYNAPSE — a multi-agent system where eight specialized services and three coordinating agents collaborate over standardized protocols to generate context-aware article briefs on any topic. This is the architectural pattern frontier labs use in production, broken into its parts and built from scratch on a laptop.',
+            },
+            {
+                type: 'heading',
+                text: 'Why Multi-Agent?',
+            },
+            {
+                type: 'paragraph',
+                text: 'The intuition every AI engineer eventually hits: a single LLM doing everything is brittle. Ask one model to fetch news, parse weather, look up exchange rates, find images, remember past conversations, route between tools, and write a polished article — somewhere in that prompt soup, things break. The fix that production systems converge on is specialization plus coordination. One service does one thing well. The model becomes the connective tissue at the end, weaving outputs together.',
+            },
+            {
+                type: 'paragraph',
+                text: 'But "multi-agent" raises its own questions. How do agents discover what tools exist? How do they talk to each other without becoming tightly coupled? How do you debug a system where six things might be running concurrently? How do you measure quality when the answer comes from a pipeline, not a single call? SYNAPSE is my answer to all of those, built one layer at a time.',
+            },
+            {
+                type: 'heading',
+                text: 'The Analogy That Unlocked Everything — A Newsroom',
+            },
+            {
+                type: 'paragraph',
+                text: 'I tried explaining multi-agent systems to a non-technical friend and failed. Then I tried again with a newsroom. There are reporters who chase stories. There are specialist desks — finance, weather, a photo archive. There is an assignment editor who decides which specialists a story actually needs. There is a copy editor who reviews everything before it goes to print. And there is a message system — a pneumatic tube, a Slack channel — that lets them coordinate without barging into each other\'s offices. Every component in SYNAPSE maps cleanly to a newsroom role, and the analogy stayed useful from Day 2 through Day 10.',
+            },
+            {
+                type: 'list',
+                items: [
+                    'MCP tool servers → specialist desks (finance, weather, photo archive).',
+                    'Contextualist agent → the researcher gathering raw material.',
+                    'Scout agent → the editor shaping the story.',
+                    'Publisher agent → the writer producing the final draft.',
+                    'Router agent → the assignment editor deciding who is needed.',
+                    'Critic agent → the copy editor deciding whether it goes to print.',
+                    'Memory server → the newsroom\'s archive. Conversation server → the active story file.',
+                    'Redis pub/sub → the pneumatic tube system. Phoenix tracing → the call-log book.',
+                ],
+            },
+            {
+                type: 'heading',
+                text: 'Phase 1 — The Foundation',
+            },
+            {
+                type: 'paragraph',
+                text: 'The first version had three MCP tool servers and three agents. MCP — Model Context Protocol — is a standardized way for LLMs to discover and call external tools. Think of it as USB-C for AI: before MCP, every framework reinvented its own tool-calling format. MCP makes a tool server look the same whether it is serving GPT-4, Claude, or a local Llama. I used FastMCP to expose each service over HTTP.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'A minimal MCP tool server with FastMCP',
+                text: `from fastmcp import FastMCP
+import httpx
+
+mcp = FastMCP("world-data")
+
+@mcp.tool()
+async def get_headlines(topic: str, limit: int = 5) -> list[dict]:
+    """Fetch recent news headlines for a topic via NewsAPI."""
+    async with httpx.AsyncClient() as client:
+        r = await client.get(
+            "https://newsapi.org/v2/everything",
+            params={"q": topic, "pageSize": limit, "sortBy": "publishedAt"},
+            headers={"X-Api-Key": NEWSAPI_KEY},
+        )
+    return [
+        {"title": a["title"], "source": a["source"]["name"], "url": a["url"]}
+        for a in r.json().get("articles", [])
+    ]
+
+if __name__ == "__main__":
+    mcp.run(transport="http", port=8003)`,
+            },
+            {
+                type: 'paragraph',
+                text: 'The three initial tool servers: world-data (NewsAPI headlines and OpenWeather conditions), finance-monitor (currency resolution and exchange rates), and media-engine (Pexels image search). The three agents: Contextualist calls the tool servers and aggregates raw signals, Scout decides the story shape based on that data, and Publisher writes the final article via an LLM call.',
+            },
+            {
+                type: 'paragraph',
+                text: 'A2A — agent-to-agent communication. The agents do not call each other directly. They drop messages into a shared mailbox, initially a JSON file called post_office.json. Just like a real newsroom — reporters do not barge into the editor\'s office, they leave drafts on the desk. This decouples agents, makes failures recoverable, and scales surprisingly well.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'The A2A mailbox — a three-function API',
+                text: `def send_message(to: str, sender: str, payload: dict) -> None:
+    """Drop a message on another agent's desk."""
+    box = _load()                       # read post_office.json
+    box.setdefault(to, []).append(
+        {"from": sender, "payload": payload, "ts": time.time()}
+    )
+    _save(box)
+
+def read_messages(agent: str) -> list[dict]:
+    """Pick up everything addressed to this agent."""
+    return _load().get(agent, [])
+
+def clear_messages(agent: str) -> None:
+    box = _load()
+    box[agent] = []
+    _save(box)`,
+            },
+            {
+                type: 'paragraph',
+                text: 'By the end of Day 2 there was a working pipeline: give it a topic, get a context-aware brief back. But the system was reactive and stateless. Every run started from zero and every flow was hardcoded.',
+            },
+            {
+                type: 'heading',
+                text: 'Phase 2 — Making It Smart',
+            },
+            {
+                type: 'paragraph',
+                text: 'Three upgrades, one underlying theme: judgment. Day 3 added a memory-server backed by ChromaDB, a local vector database. After every brief is published it is embedded and stored; before every new brief the system retrieves the top-3 most relevant past briefs as additional context. This is the difference between hiring a freelance writer for every article and having a staff reporter on a beat — the freelancer starts cold every time; the staff reporter remembers what they covered last week and builds on it.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 4 converted the Streamlit UI from "one topic → one brief" into a chat. Each session gets a conversation_id, and follow-up questions read both the new query and the conversation history. If long-term memory is years of past briefs, multi-turn is working memory — what was just said in this conversation. Humans need both; agents do too.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 5 added the Router agent, sitting above the Scout. Instead of every brief calling every tool server, the Router does an LLM call first to decide which tools actually matter. "Bitcoin\'s price?" routes to only finance-monitor. "Tokyo weather?" routes to only world-data. Before, the newsroom assigned every story to every reporter. The Router is the assignment editor — reads the pitch, decides who is actually needed. Cheaper, faster, less noise.',
+            },
+            {
+                type: 'paragraph',
+                text: 'A design decision worth flagging: I deliberately did not route follow-up turns through the memory server. Follow-ups operate on the current conversation\'s data — pulling in semantically related but different past briefs would muddy the LLM\'s context. So memory stays scoped to cross-conversation recall during initial brief generation, and follow-ups stay scoped to this conversation\'s data plus this conversation\'s history. It is invisible to users and very visible in output quality. Architecture is choosing which tradeoffs to take, not avoiding them.',
+            },
+            {
+                type: 'heading',
+                text: 'Phase 3 — Making It Trustworthy',
+            },
+            {
+                type: 'paragraph',
+                text: 'A smart system you cannot measure or debug is just a black box that occasionally surprises you. Day 6 added distributed tracing with Arize Phoenix. Every agent, every MCP server, every LLM call now emits OpenTelemetry spans. Every brief produces a full waterfall view: which tools fired, what they returned, how long they took, what the LLM was asked, the token counts, and the cost. Going from print() statements to distributed tracing is like going from asking each delivery driver to phone in updates to putting a GPS tracker on every truck.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Two architectural choices mattered here. First, Phoenix over Langfuse — Phoenix runs entirely on localhost, no signup, no cloud account. For a portfolio piece on a recruiter\'s laptop, that is the difference between "they cloned it and saw the traces" and "they cloned it and gave up." For production you would swap in Langfuse or Honeycomb; the OpenInference instrumentation stays identical. Second, per-service traces rather than one unified trace — a unified trace would require propagating OpenTelemetry context through MCP boundaries, which FastMCP does not expose cleanly. Per-service traces grouped by service name are less elegant but ship today and are rich enough to debug almost anything.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 7 built an eval-server that uses LLM-as-judge to score generated briefs against a 20-topic curated dataset. Each brief is graded on factual coverage, structural quality, and hallucination rate; results are persisted as JSON and visualized in a Streamlit eval page. Without evals, "is the model better?" is a vibes-based question. With evals it becomes measurable — and most builders skip this entirely.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 8 added a critic-server and a draft → critique → revise cycle inside the Publisher. After the first draft, the Critic scores the brief against a rubric. If the score is below threshold, it sends a revision request back to the Publisher with specific feedback, capped at a configurable maximum. This is the reflection pattern from the 2024-25 research wave (Reflexion, Self-Refine) — it improves output quality with minimal architectural complexity.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'The self-critique loop inside the Publisher',
+                text: `def publish(brief_request, max_revisions=2, threshold=0.8):
+    draft = writer_llm(brief_request)
+
+    for attempt in range(max_revisions):
+        review = critic_server.score(draft, rubric=RUBRIC)
+        if review["score"] >= threshold:
+            break
+        draft = writer_llm(
+            brief_request,
+            previous_draft=draft,
+            feedback=review["feedback"],   # specific, actionable
+        )
+
+    return draft, review`,
+            },
+            {
+                type: 'heading',
+                text: 'Phase 4 — Making It Production-Ready',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 9 added Redis as a shared cache with TTL. External API responses (NewsAPI, OpenWeather, ExchangeRate, Pexels) are cached for short windows, so a single user spamming "regenerate" no longer racks up hundreds of paid API calls. Per-run LLM cost is tracked and displayed in the UI. The cache uses a fail-safe no-op fallback: if Redis is unreachable, the cache becomes a transparent pass-through — no errors, no crashes, the system just runs without caching. That pattern holds for every external dependency in SYNAPSE: degrade gracefully, never fail outright.',
+            },
+            {
+                type: 'paragraph',
+                text: 'Day 10 replaced the file mailbox with Redis pub/sub. The original A2A post office was a shared JSON file — beautiful for teaching, terrible for production, because multiple processes polling the same file are fundamentally racy. Each agent now subscribes to its own channel (synapse:mailbox:<agent>) and senders publish to those channels. Same three-function API — send_message, read_messages, clear_messages — so no call-site changes anywhere in the agents.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'Same API surface, Redis pub/sub underneath',
+                text: `import redis, json
+
+r = redis.Redis(decode_responses=True)
+
+def send_message(to: str, sender: str, payload: dict) -> None:
+    r.publish(f"synapse:mailbox:{to}",
+              json.dumps({"from": sender, "payload": payload}))
+
+def read_messages(agent: str) -> list[dict]:
+    pubsub = r.pubsub()
+    pubsub.subscribe(f"synapse:mailbox:{agent}")
+    msgs = []
+    while (m := pubsub.get_message(timeout=0.1)):
+        if m["type"] == "message":
+            msgs.append(json.loads(m["data"]))
+    return msgs
+
+# If Redis is unreachable, this module falls back to the
+# original JSON-file mailbox automatically — same API, both
+# protocol versions coexist, switchable at runtime.`,
+            },
+            {
+                type: 'paragraph',
+                text: 'I also built a small dev utility, scripts/watch_mailbox.py, that subscribes to every mailbox channel via Redis PSUBSCRIBE and pretty-prints each A2A message as it arrives. Run it in a side terminal and you can literally watch the Contextualist → Scout handoff happen in real time. It is the closest thing to magic in the whole build.',
+            },
+            {
+                type: 'heading',
+                text: 'The Architecture, Top to Bottom',
+            },
+            {
+                type: 'list',
+                items: [
+                    '8 MCP tool servers — world-data, finance-monitor, media-engine, memory, conversation, router, eval, critic.',
+                    '3 agents — Contextualist, Scout, Publisher (with the Router above and the Critic inside Publisher).',
+                    '2 storage backends — ChromaDB for semantic memory, Redis for cache and mailbox.',
+                    '1 observability stack — Arize Phoenix with OpenInference auto-instrumentation.',
+                    '1 UI — Streamlit with a mailbox status badge and an evals dashboard.',
+                    'Fail-safe everywhere — Redis cache → no-op fallback; Redis mailbox → file fallback; tool server unavailable → graceful skip.',
+                ],
+            },
+            {
+                type: 'heading',
+                text: 'What I\'d Do Differently',
+            },
+            {
+                type: 'list',
+                items: [
+                    'Start with tracing on Day 1. I added Phoenix on Day 6 and spent six days guessing which paths were slow and where cost was leaking. Instrument from the first call.',
+                    'The "same API, different backend" pattern is the biggest leverage move. Both the cache and the mailbox use it — ship a teaching-friendly version on day one, graduate to production without rewriting call sites.',
+                    'Per-service traces are good enough. Unified OpenTelemetry context propagation through MCP is not worth the engineering at this scale. Save it for when scale forces it.',
+                ],
+            },
+            {
+                type: 'heading',
+                text: 'What\'s Next — Docker and Kubernetes',
+            },
+            {
+                type: 'paragraph',
+                text: 'The final two days are where AI engineering meets infrastructure. Day 11 containerizes every service — one Dockerfile per agent, per MCP server, plus the UI. Eleven containers, composed by a single docker-compose.yml that spins the whole stack up with one command. Day 12 deploys SYNAPSE on Kubernetes: each service becomes its own Deployment plus Service, a ConfigMap holds API keys (a Secret in real production), Redis runs as a StatefulSet, and the Streamlit UI is exposed via an Ingress — the same pattern I used for my earlier Rails-on-Kubernetes project, applied to AI workloads instead of a CRUD app.',
+            },
+            {
+                type: 'code',
+                language: 'yaml',
+                title: 'critic-server.yaml — one service, the K8s way',
+                text: `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: critic-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: critic-server }
+  template:
+    metadata:
+      labels: { app: critic-server }
+    spec:
+      containers:
+        - name: critic-server
+          image: synapse/critic-server:latest
+          ports: [{ containerPort: 8010 }]
+          envFrom:
+            - configMapRef: { name: synapse-config }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: critic-svc
+spec:
+  selector: { app: critic-server }
+  ports: [{ port: 8010, targetPort: 8010 }]`,
+            },
+            {
+                type: 'paragraph',
+                text: 'This is the moment the portfolio coheres: the fine-tuning track, the multi-agent track, and the Kubernetes track converge into one demonstration — build AI systems and run them in production.',
+            },
+            {
+                type: 'heading',
+                text: 'The Bigger Point',
+            },
+            {
+                type: 'paragraph',
+                text: '"Agentic AI" is not magic. It is mostly good system design. The hard part is not the AI — it is choosing where each LLM call lives, what each service knows, how state flows through the pipeline, how failures degrade, and how you will debug it at 2 AM when something breaks.',
+            },
+            {
+                type: 'paragraph',
+                text: 'If you can architect microservices, you can architect agents. Most of the patterns transfer one-to-one — service discovery, message queues, observability, fail-safe defaults, graceful degradation. AI engineering, at this layer, is software engineering with one new tool in the kit.',
+            },
+            {
+                type: 'heading',
+                text: 'Key Takeaways',
+            },
+            {
+                type: 'list',
+                items: [
+                    'Specialization plus coordination beats one model doing everything. One service, one job.',
+                    'MCP is USB-C for tools — a standard interface that works across model providers.',
+                    'Decouple agents with a shared mailbox. They leave drafts on the desk, they do not barge in.',
+                    'Separate cross-conversation memory from within-conversation history. They serve different purposes.',
+                    'Instrument on Day 1. Evals turn "is it better?" from a vibe into a number.',
+                    'Design every external dependency to degrade gracefully — same API, fallback backend.',
+                ],
+            },
+            {
+                type: 'paragraph',
+                text: 'The full repo is open source. Clone it, add your API keys, run one script, and the entire stack boots on your laptop — app on port 8501, Phoenix trace dashboard on 6006, and an optional third terminal to watch A2A messages fly between agents in real time.',
+            },
+            {
+                type: 'code',
+                language: 'bash',
+                title: 'Quickstart',
+                text: `git clone https://github.com/Keerthan22-sys/multi-agent-system-a2a-mcp
+cd multi-agent-system-a2a-mcp
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt && pip install -e .
+cp .env.example .env   # add your API keys
+
+# start Redis, then:
+./scripts/start_backends.sh
+
+# in another terminal:
+streamlit run ui/app.py`,
+            },
+        ],
+        projects: [
+            {
+                name: 'multi-agent-system-a2a-mcp',
+                link: 'https://github.com/Keerthan22-sys/multi-agent-system-a2a-mcp',
+            },
+        ],
+        resources: [
+            {
+                category: 'Agent Design Patterns',
+                items: [
+                    {
+                        name: 'Anthropic — Building Effective Agents',
+                        url: 'https://www.anthropic.com/research/building-effective-agents',
+                        note: 'The reference taxonomy — workflows vs. agents, when to use each',
+                    },
+                    {
+                        name: 'Anthropic — How We Built Our Multi-Agent Research System',
+                        url: 'https://www.anthropic.com/engineering/built-multi-agent-research-system',
+                        note: 'Orchestrator-worker pattern in production, with the tradeoffs',
+                    },
+                ],
+            },
+            {
+                category: 'Observability & Evaluation',
+                items: [
+                    {
+                        name: 'Arize Phoenix — Documentation',
+                        url: 'https://docs.arize.com/phoenix',
+                        note: 'Local-first OpenTelemetry tracing for LLM apps',
+                    },
+                    {
+                        name: 'OpenAI — Agents SDK Tracing',
+                        url: 'https://openai.github.io/openai-agents-python/tracing/',
+                        note: 'How the built-in trace/span model works',
+                    },
+                ],
+            },
+            {
+                category: 'Protocols',
+                items: [
+                    {
+                        name: 'Model Context Protocol — Specification',
+                        url: 'https://modelcontextprotocol.io/specification',
+                        note: 'The standard behind every tool server in this build',
+                    },
+                    {
+                        name: 'FastMCP',
+                        url: 'https://github.com/jlowin/fastmcp',
+                        note: 'The library used to expose each service over HTTP',
+                    },
+                ],
+            },
+        ],
+    },
+    {
         slug: 'fine-tuning-llms-qlora',
         title: 'Fine-Tuning LLMs with QLoRA — From Base Model to Domain Expert on a Free GPU',
         date: 'June 2026',

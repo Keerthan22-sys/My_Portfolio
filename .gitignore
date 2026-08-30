@@ -1,1 +1,8 @@
 node_modules
+
+# personal goal-system files (never publish)
+goal.md
+context/
+history/
+system/
+.claude/skills/job-*
