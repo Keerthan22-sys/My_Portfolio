@@ -1,5 +1,246 @@
 const blogPosts = [
     {
+        slug: 'openai-postgresql-800-million-users',
+        title: 'OpenAI Runs 800 Million Users on a Single PostgreSQL Primary — Here\'s How',
+        date: 'July 2026',
+        readTime: '11 min read',
+        tags: ['PostgreSQL', 'Scaling', 'Databases', 'Systems Design'],
+        excerpt: 'OpenAI scaled vanilla PostgreSQL to serve 800M ChatGPT users — millions of queries per second — on one primary and ~50 read replicas. No distributed database underneath. This is a breakdown of the eight engineering decisions that made it possible, and the reasoning behind each.',
+        content: [
+            {
+                type: 'intro',
+                text: 'OpenAI published a detailed engineering writeup on how they scaled PostgreSQL to serve 800 million ChatGPT users, handling millions of queries per second, with a single primary instance and roughly 50 read replicas. Most engineers hear "single primary" at that scale and assume there must be a distributed database underneath. There isn\'t. It\'s vanilla PostgreSQL on Azure, scaled through disciplined engineering decisions layered on top of each other. I spent time mapping their architecture — here is what they actually did, and why each choice exists.',
+            },
+            {
+                type: 'heading',
+                text: 'The One Decision Everything Flows From',
+            },
+            {
+                type: 'paragraph',
+                text: 'The primary only handles writes. Every read that can possibly go to a replica, does. Every technique below is downstream of that single rule — it either protects the primary\'s write path or moves load off it. There is no sharding of the existing workload and no exotic storage engine; it is Postgres doing what Postgres does, with a lot of pressure kept off the one node that matters.',
+            },
+            {
+                type: 'paragraph',
+                text: 'The failure mode they are engineering against is a feedback loop: a traffic spike causes cache misses, the misses flood the primary with reads, latency rises, requests start timing out, clients retry, the retries add more load, latency rises further — and the database falls over. Every one of the eight techniques breaks this loop at a different link.',
+            },
+            {
+                type: 'heading',
+                text: '1. Offload Reads to Replicas — Aggressively',
+            },
+            {
+                type: 'paragraph',
+                text: 'The obvious part is "send reads to replicas." The hard part is the word "can." A read issued inside a write transaction cannot go to a replica — it has to see the transaction\'s own uncommitted writes, so it stays on the primary. The team audited every query in the codebase to find those cases and refactored them out wherever possible, pulling reads out of write transactions so they could be redirected.',
+            },
+            {
+                type: 'heading',
+                text: '2. Kill Expensive Queries Before They Become Incidents',
+            },
+            {
+                type: 'paragraph',
+                text: 'One query that joined 12 tables was responsible for multiple high-severity outages. The fix was to move complex join logic into the application layer — let PostgreSQL do simple indexed lookups, and let backend code assemble the results. The bigger lesson: ORMs like SQLAlchemy or ActiveRecord are the main source of expensive queries, because they generate SQL you never explicitly wrote and probably never reviewed.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'Move the join out of the database',
+                text: `# Before — one ORM call fans out into a 12-table join
+convos = (
+    session.query(Conversation)
+    .options(joinedload(Conversation.messages)
+             .joinedload(Message.attachments),
+             joinedload(Conversation.user)
+             .joinedload(User.org)
+             .joinedload(Org.billing_plan))
+    .filter(Conversation.user_id == uid)
+    .all()
+)
+
+# After — a few simple indexed lookups, joined in Python
+convos   = repo.conversations_for_user(uid)          # PK/index scan
+msg_map  = repo.messages_for(ids(convos))            # IN (...) on an index
+user     = cache.get_or_load(f"user:{uid}")          # usually a cache hit
+for c in convos:
+    c.messages = msg_map.get(c.id, [])`,
+            },
+            {
+                type: 'heading',
+                text: '3. PgBouncer — Connection Pooling Worth 10×',
+            },
+            {
+                type: 'paragraph',
+                text: 'PostgreSQL has a hard ceiling of about 5,000 connections per instance, and each one carries real backend-process overhead. Without pooling, every application thread holds an open connection and you hit the ceiling fast — "connection storms" are one of OpenAI\'s documented incident patterns. PgBouncer sits in front of the database as a proxy, holds a small stable pool of real connections, and multiplexes thousands of application threads across them. In their benchmarks, connection setup time dropped from 50ms to 5ms.',
+            },
+            {
+                type: 'code',
+                language: 'ini',
+                title: 'pgbouncer.ini — transaction-level pooling',
+                text: `[databases]
+chatgpt = host=primary.postgres.internal port=5432 dbname=chatgpt
+
+[pgbouncer]
+pool_mode = transaction          ; return the connection after each txn
+max_client_conn = 20000          ; app-facing connections
+default_pool_size = 40           ; real connections to Postgres per user/db
+reserve_pool_size = 10
+server_idle_timeout = 60
+query_wait_timeout = 5`,
+            },
+            {
+                type: 'heading',
+                text: '4. Cache Locking to Survive Cache-Miss Storms',
+            },
+            {
+                type: 'paragraph',
+                text: 'Caching is standard; the interesting part is their handling of the cache-miss storm — when a cache node dies and every request suddenly hits PostgreSQL for data that used to be served from memory. Their fix is a single-flight lock: when many requests miss on the same key at once, exactly one acquires a lock and fetches from the database while the rest wait for the cache to be repopulated. Ten thousand simultaneous misses become one query, not ten thousand.',
+            },
+            {
+                type: 'code',
+                language: 'python',
+                title: 'Single-flight: one fetch, everyone else waits',
+                text: `def get_or_load(key, loader, ttl=60):
+    val = cache.get(key)
+    if val is not None:
+        return val
+
+    # Only one caller wins the lock; others poll for the result.
+    if cache.set(f"lock:{key}", 1, nx=True, ex=5):
+        try:
+            val = loader()                 # the single DB hit
+            cache.set(key, val, ex=ttl)
+            return val
+        finally:
+            cache.delete(f"lock:{key}")
+
+    for _ in range(50):
+        time.sleep(0.05)
+        val = cache.get(key)
+        if val is not None:
+            return val
+    return loader()                        # last-resort fallback`,
+            },
+            {
+                type: 'heading',
+                text: '5. Workload Isolation — No Noisy Neighbours',
+            },
+            {
+                type: 'paragraph',
+                text: 'Different features get different resource budgets. A new experimental feature that fires expensive queries should not be able to degrade ChatGPT\'s core conversation flow. The solution is to split traffic into priority tiers and route each tier to dedicated replica instances. High-priority traffic (the conversation API) and low-priority traffic (background analytics, experiments) never share a PostgreSQL instance, so a bad query in one tier is contained to that tier.',
+            },
+            {
+                type: 'heading',
+                text: '6. Cascading Replication — Scaling Past 50 Replicas',
+            },
+            {
+                type: 'paragraph',
+                text: 'With direct replication, the primary must stream its write-ahead log (WAL) to every single replica. Around 50 replicas, that fan-out starts to cost the primary real network and CPU — exactly the node you cannot afford to load. Their next evolution, in testing: cascading replication, where a small set of tier-1 replicas receive WAL from the primary and relay it downstream to the rest. The primary streams to a handful of nodes instead of fifty.',
+            },
+            {
+                type: 'heading',
+                text: '7. Multi-Layer Rate Limiting',
+            },
+            {
+                type: 'paragraph',
+                text: 'Rate limiting lives at four layers: application code, PgBouncer, the proxy, and the query level. When one query pattern spikes, they can block that exact query digest without touching anything else. They also enforce timeouts on idle transactions — a long-running idle transaction holds an old snapshot, which blocks autovacuum (PostgreSQL\'s background cleanup), which causes table bloat over time.',
+            },
+            {
+                type: 'code',
+                language: 'sql',
+                title: 'Bound idle transactions and slow statements',
+                text: `-- Kill transactions left idle mid-flight; they block autovacuum
+SET idle_in_transaction_session_timeout = '5s';
+
+-- Cap any single statement
+SET statement_timeout = '2s';
+
+-- Surgical control: block one misbehaving query digest,
+-- leave everything else untouched (enforced at the proxy layer)
+--   digest: a1b2c3...  ->  action: reject`,
+            },
+            {
+                type: 'heading',
+                text: '8. Schema Changes Under Strict Constraints',
+            },
+            {
+                type: 'paragraph',
+                text: 'Even a small ALTER can trigger a full table rewrite in PostgreSQL, which takes a lock and causes downtime. Their rules: only lightweight alterations that do not rewrite the table, a 5-second hard timeout on any schema change, and new features must go to CosmosDB rather than adding to PostgreSQL. Backfilling a column runs with rate limits and sometimes takes over a week — but it never causes a production incident.',
+            },
+            {
+                type: 'code',
+                language: 'sql',
+                title: 'Make schema changes non-blocking',
+                text: `-- Never wait more than 5s for a lock; never hold one longer
+SET lock_timeout = '5s';
+SET statement_timeout = '5s';
+
+-- Safe: metadata-only in modern Postgres
+ALTER TABLE messages ADD COLUMN model_version text;
+
+-- Unsafe: rewrites and long-locks the whole table
+--   ALTER TABLE messages ADD COLUMN seq bigserial;
+--   ALTER TABLE messages ALTER COLUMN body TYPE varchar(8000);
+
+-- Backfill in throttled batches, out of band
+UPDATE messages SET model_version = 'gpt-4o'
+WHERE id BETWEEN :lo AND :hi;   -- small ranges, sleep between`,
+            },
+            {
+                type: 'heading',
+                text: 'What I Took Away',
+            },
+            {
+                type: 'list',
+                items: [
+                    'The right default architecture buys enormous headroom. A read-heavy workload with strong caching, solid pooling, and replica offloading reaches hundreds of millions of users on one primary — if you are disciplined about writes.',
+                    'Sharding is a last resort, not a default. OpenAI says sharding the existing workload would touch hundreds of endpoints and take months; they move write-heavy new workloads to CosmosDB instead — a far smaller change.',
+                    'The failure modes are operational, not architectural. Their incidents came from cache-miss storms, connection exhaustion, expensive ORM queries, and write spikes on launches — not from hitting a fundamental limit.',
+                    'Observability and surgical controls beat raw capacity. Blocking a specific query digest, isolating workloads to dedicated instances, and per-layer rate limits are what let them respond to incidents without rolling back features.',
+                    'MVCC is still a real constraint at write scale. Row-versioning overhead makes write-heavy workloads less efficient in Postgres — which is the honest reason new write-heavy tables go to CosmosDB, not because Postgres is bad.',
+                ],
+            },
+            {
+                type: 'paragraph',
+                text: 'The takeaway that stuck with me: at 800 million users, the interesting engineering was not a clever distributed system. It was a hundred small, disciplined decisions about what the primary is allowed to do — and the observability to enforce them.',
+            },
+        ],
+        resources: [
+            {
+                category: 'The Source Material',
+                items: [
+                    {
+                        name: 'OpenAI Engineering — Scaling PostgreSQL',
+                        url: 'https://openai.com/index/scaling-postgresql/',
+                        note: 'The original writeup by Bohan Zhang',
+                    },
+                    {
+                        name: '"The Part of PostgreSQL We Hate the Most"',
+                        url: 'https://www.cs.cmu.edu/~pavlo/blog/2023/04/the-part-of-postgresql-we-hate-the-most.html',
+                        note: 'Deep dive on MVCC — Bohan Zhang & Andy Pavlo (CMU)',
+                    },
+                ],
+            },
+            {
+                category: 'Postgres Operations',
+                items: [
+                    {
+                        name: 'PostgreSQL — Cascading Replication',
+                        url: 'https://www.postgresql.org/docs/current/warm-standby.html#CASCADING-REPLICATION',
+                        note: 'Official docs for the tier-1 relay pattern',
+                    },
+                    {
+                        name: 'Crunchy Data — When Does ALTER TABLE Require a Rewrite?',
+                        url: 'https://www.crunchydata.com/blog/when-does-alter-table-require-a-rewrite',
+                        note: 'Which schema changes are safe and which lock the table',
+                    },
+                    {
+                        name: 'Azure Database for PostgreSQL — Flexible Server',
+                        url: 'https://learn.microsoft.com/en-us/azure/postgresql/overview',
+                        note: 'The managed platform OpenAI runs on',
+                    },
+                ],
+            },
+        ],
+    },
+    {
         slug: 'multi-agent-ai-system-synapse',
         title: 'I Built a Multi-Agent AI System — 11 Services, One Newsroom Architecture',
         date: 'June 2026',
