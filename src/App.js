@@ -3,6 +3,7 @@ import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
+import Experience from './components/Experience';
 import Projects from './components/Projects';
 import Fundamentals from './components/Fundamentals';
 import Stack from './components/Stack';
@@ -14,6 +15,7 @@ const HomePage = () => (
   <>
     <Hero />
     <About />
+    <Experience />
     <Projects />
     <Fundamentals />
     <Stack />

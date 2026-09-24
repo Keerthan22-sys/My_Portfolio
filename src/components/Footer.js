@@ -11,12 +11,12 @@ const Footer = () => {
                         <span>worth shipping.</span>
                     </h2>
                     <p className="footer-cta-sub">
-                        Looking for a founding-team AI engineer at your YC startup?
-                        I'm available — let's talk.
+                        Always open to discussing AI systems, backend architecture,
+                        and ambitious engineering challenges.
                     </p>
                     <div className="footer-social">
-                        <a href="mailto:keerthangowdas222@gmail.com">
-                            <HiMail /> keerthangowdas222@gmail.com
+                        <a href="mailto:keerthangowdas.work@gmail.com">
+                            <HiMail /> keerthangowdas.work@gmail.com
                         </a>
                         <a
                             href="https://www.linkedin.com/in/keerthangowdas/"
@@ -51,10 +51,10 @@ const Footer = () => {
 
                 <div className="footer-bottom">
                     <span className="footer-copy">
-                        © 2026 Keerthan Gowda S
+                        &copy; 2026 Keerthan Gowda S
                     </span>
                     <span className="footer-made">
-                        Innovating and Impacting businesses scale...
+                        Bengaluru, India
                     </span>
                 </div>
             </div>

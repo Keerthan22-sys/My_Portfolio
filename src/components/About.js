@@ -3,22 +3,37 @@ const About = () => {
         {
             icon: '🏆',
             value: 'National Winner',
-            label: 'Smart India Hackathon 2022 — beat thousands of teams across the country'
+            label: 'Smart India Hackathon 2022 (UIDAI/MeitY, Govt. of India)',
+        },
+        {
+            icon: '🎤',
+            value: 'Speaker',
+            label: '2-Day Faculty Development Programme on Multi-Agent AI Systems — Ramaiah Institute of Technology (July 2026)',
         },
         {
             icon: '🚀',
             value: 'Top 20 / 625',
-            label: 'FKCCI Manthan business plan competition — top 3% finish'
+            label: 'FKCCI Manthan business plan competition — top 3% finish',
         },
         {
-            icon: '📐',
+            icon: '🎓',
             value: 'AIR 5469',
-            label: 'National Engineering Olympiad — merit scholarship from Marubeni India'
+            label: 'National Engineering Olympiad — Marubeni India Merit Scholarship recipient',
+        },
+    ];
+
+    const education = [
+        {
+            degree: 'M.S. — Computer Science',
+            school: 'Scaler x Woolf University',
+            period: 'Jan 2025 — Nov 2026',
+            detail: 'GPA: 3.8 | Focus: Distributed Systems, Production ML/AI, System Design',
         },
         {
-            icon: '🤖',
-            value: 'Multi-Agent Builder',
-            label: 'A2A + MCP protocol systems, CrewAI pipelines, and autonomous research agents'
+            degree: 'B.E. — Computer Science',
+            school: 'Visvesvaraya Technological University',
+            period: 'Aug 2019 — May 2023',
+            detail: 'CGPA: 8.74 | Data Structures & Algorithms, Machine Learning, Software Engineering',
         },
     ];
 
@@ -30,29 +45,35 @@ const About = () => {
                 <div className="about-grid">
                     <div className="about-bio">
                         <p>
-                            I'm an AI Engineer based in India, actively targeting <strong>early-stage
-                            YC-backed startups</strong> where I can have real, outsized impact. I
-                            build AI systems end-to-end — from researching the right model architecture
-                            to shipping a product that users actually love.
+                            I'm a <strong>Software Engineer</strong> specializing in
+                            AI and backend systems, currently building agentic AI
+                            pipelines at <strong>MHP India — A Porsche Company</strong>.
+                            I design systems end-to-end — from LLM-based rule evaluation
+                            to cloud-native deployment on AWS.
                         </p>
                         <p>
-                            My approach is unusual: I study AI from <strong>first principles</strong> —
-                            implementing autograd from scratch, building BPE tokenizers,
-                            training GPTs — while simultaneously shipping multi-agent systems
-                            using the latest protocols like <strong>A2A and MCP</strong>.
+                            My approach bridges <strong>first-principles understanding</strong> with
+                            production engineering. I've implemented autograd from scratch, trained
+                            GPTs, and built BPE tokenizers — while simultaneously shipping multi-agent
+                            systems using <strong>MCP, A2A, and CrewAI</strong> in enterprise environments.
                         </p>
                         <p>
-                            I have a <strong>founder's mindset</strong>. I think about the user,
-                            the business model, and the technical architecture simultaneously.
-                            That's what makes AI engineering interesting to me — it's not just
-                            about making the model work, it's about making a product people need.
+                            Before MHP, I spent 2.5 years at <strong>Celstream Technologies</strong> building
+                            production REST APIs, containerized microservices, and CI/CD pipelines
+                            with Java, Spring Boot, and Kubernetes. I bring both the AI depth and
+                            the backend rigor.
                         </p>
-                        <p>
-                            Previously led teams in national hackathons, won Smart India
-                            Hackathon 2022 nationally, and placed top 3% in a 625-team
-                            business competition. Open to work on hard problems where
-                            AI is the core product, not a feature.
-                        </p>
+
+                        <div className="about-education">
+                            <h3 className="about-education-title">Education</h3>
+                            {education.map((ed) => (
+                                <div key={ed.degree} className="edu-item">
+                                    <div className="edu-degree">{ed.degree}</div>
+                                    <div className="edu-school">{ed.school} <span className="edu-period">{ed.period}</span></div>
+                                    <div className="edu-detail">{ed.detail}</div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                     <div className="about-stats">
                         {stats.map((s) => (
