@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -8,26 +8,25 @@
 
 :root {
     /* Palette */
-    --bg:        #0a0a0f;
-    --surface:   #111118;
-    --surface-2: #18181f;
-    --border:    #1e1e2a;
-    --border-2:  #2a2a3a;
+    --bg:        #050507;
+    --surface:   #0c0c11;
+    --surface-2: #141419;
+    --border:    #1c1c28;
+    --border-2:  #28283a;
 
     /* Text */
-    --text:   #eeeef5;
-    --text-2: #7878a0;
-    --text-3: #3a3a55;
+    --text:   #f5f5f7;
+    --text-2: #8888a4;
+    --text-3: #44445e;
 
-    /* Accent — electric indigo */
-    --accent:       #6366f1;
-    --accent-light: #818cf8;
-    --accent-dim:   rgba(99, 102, 241, 0.10);
-    --accent-glow:  rgba(99, 102, 241, 0.28);
+    /* Accent — warm amber */
+    --accent:       #f59e0b;
+    --accent-light: #fbbf24;
+    --accent-dim:   rgba(245, 158, 11, 0.08);
+    --accent-glow:  rgba(245, 158, 11, 0.18);
 
     /* Status */
-    --green: #4ade80;
-    --amber: #fbbf24;
+    --green: #22c55e;
 
     /* Fonts */
     --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -61,12 +60,11 @@ a {
 
 img { display: block; max-width: 100%; }
 
-/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 
 @media (max-width: 768px) {
-    :root { --page-x: 2.4rem; }
+    :root { --page-x: 2rem; }
 }

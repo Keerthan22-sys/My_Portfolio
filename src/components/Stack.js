@@ -1,73 +1,62 @@
 const categories = [
     {
-        label: 'AI / ML',
+        label: 'AI/ML & LLM Engineering',
         items: [
-            'Python',
-            'PyTorch',
-            'LangChain',
-            'CrewAI',
-            'HuggingFace Transformers',
-            'OpenAI API',
-            'Unsloth / QLoRA',
-            'DPO Alignment',
-            'Streamlit',
-            'scikit-learn',
+            'RAG Pipelines',
+            'Multi-Agent Systems (MCP, A2A)',
+            'LLM Fine-Tuning (QLoRA, LoRA, DPO, SFT)',
+            'Prompt Engineering',
+            'LLM-as-Judge',
+            'NLP & Deep Learning',
+            'PyTorch / TensorFlow',
+            'Scikit-learn / XGBoost',
         ],
     },
     {
-        label: 'Agents & Protocols',
-        items: [
-            'A2A Protocol',
-            'Model Context Protocol (MCP)',
-            'RAG pipelines',
-            'Tool-calling / Function use',
-            'LangGraph',
-            'Firecrawl',
-            'Multi-agent orchestration',
-        ],
-    },
-    {
-        label: 'Backend & APIs',
+        label: 'Frameworks',
         items: [
             'FastAPI',
+            'Next.js / React',
             'Node.js',
-            'Java (Spring Boot)',
-            'Go',
+            'Spring Boot',
             'Django',
-            'REST / GraphQL',
-            'MySQL / PostgreSQL',
+            'LangChain / LlamaIndex',
+            'HuggingFace (TRL, PEFT)',
+            'Unsloth / CrewAI',
         ],
     },
     {
-        label: 'Frontend',
+        label: 'Backend & Data',
         items: [
-            'React',
-            'TypeScript',
-            'Next.js',
-            'Angular',
-            'HTML5 / CSS3',
+            'PostgreSQL / MySQL',
+            'Redis / MongoDB',
+            'DynamoDB / ChromaDB / Pinecone',
+            'Kafka / Spark',
+            'REST APIs / GraphQL',
+            'Microservices',
+            'Event-Driven Architecture',
+            'System Design',
         ],
     },
     {
         label: 'Infrastructure',
         items: [
-            'AWS',
-            'Docker',
-            'Kubernetes',
-            'Linux',
-            'Git / GitHub',
-            'Firebase',
-            'Vercel',
+            'AWS (EC2, S3, CDK, Lambda, ECR, ECS, BDA, Textract)',
+            'Docker / Kubernetes',
+            'GitHub Actions / GitLab CI/CD',
+            'Arize Phoenix / OpenTelemetry',
+            'Prometheus / Grafana',
+            'Nginx / Linux',
         ],
     },
     {
         label: 'Languages',
         items: [
-            'Python',
-            'TypeScript / JavaScript',
             'Java',
-            'Go',
-            'SQL',
+            'Python',
+            'JavaScript / TypeScript',
+            'Golang',
+            'GraphQL / SQL',
         ],
     },
 ];
@@ -79,8 +68,8 @@ const Stack = () => {
                 <div className="section-eyebrow">Stack</div>
                 <h2 className="section-title">Tools I reach for</h2>
                 <p className="section-lead">
-                    Opinionated about the right tool for the job. Comfortable going
-                    deep into any layer of the stack when needed.
+                    From fine-tuning LLMs to deploying microservices on Kubernetes —
+                    comfortable going deep into any layer of the stack.
                 </p>
                 <div className="stack-grid">
                     {categories.map((cat) => (

@@ -4,22 +4,24 @@ import { HiDocumentText } from 'react-icons/hi';
 const Hero = () => {
     return (
         <section className="hero" id="hero">
+            <div className="hero-grid-bg" aria-hidden="true" />
             <div className="hero-inner">
 
                 <div className="hero-status">
                     <span className="hero-status-dot" aria-hidden="true" />
-                    Open to roles at early-stage AI startups
+                    AI Consultant at MHP India — A Porsche Company
                 </div>
 
                 <h1 className="hero-headline">
-                    I build AI<br />
-                    <span className="hero-headline-accent">that ships.</span>
+                    I build AI systems<br />
+                    <span className="hero-headline-accent">that ship.</span>
                 </h1>
 
                 <p className="hero-sub">
-                    AI Engineer focused on <strong>LLMs, autonomous agents, and
-                    multi-agent systems</strong>. I understand the stack from
-                    autograd to production — and I move fast.
+                    Software Engineer specializing in <strong>AI agents, RAG pipelines,
+                    multi-agent orchestration</strong>, and <strong>distributed backend
+                    services</strong>. From LLM fine-tuning to cloud-native deployment —
+                    I own the full stack.
                 </p>
 
                 <div className="hero-ctas">

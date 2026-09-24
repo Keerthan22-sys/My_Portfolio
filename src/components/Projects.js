@@ -1,43 +1,42 @@
 import { FaGithub } from 'react-icons/fa';
 import { HiArrowRight } from 'react-icons/hi';
 
-
 const featured = [
     {
+        badge: 'Enterprise RAG',
+        name: 'DevOnboard AI — Privacy-First RAG Platform',
+        tagline: 'End-to-end: FastAPI async backend + RAG pipeline + PostgreSQL + JWT auth',
+        desc: 'Engineered the FastAPI async backend with SQLAlchemy 2.0, Pydantic v2, JWT auth, and a normalized PostgreSQL schema exposing full REST APIs for auth, document management, chat, and audit logging. Designed the RAG pipeline: format-aware ingestion, recursive token-based chunking (1000 tokens, 200 overlap), sentence-transformer embeddings (MiniLM-L6-v2), ChromaDB vector store, top-k retrieval with cross-encoder reranking, and Ollama LLM generation with strict source-citation prompting.',
+        tech: ['FastAPI', 'SQLAlchemy 2.0', 'PostgreSQL', 'ChromaDB', 'Pydantic v2', 'JWT', 'Ollama', 'sentence-transformers'],
+        github: 'https://github.com/Keerthan22-sys/DevOnboard_AI',
+        accent: true,
+    },
+    {
+        badge: 'Multi-Agent Systems',
+        name: 'SYNAPSE — Multi-Agent Intelligence System',
+        tagline: '13-microservice pipeline: router → researcher → writer → critic',
+        desc: 'Engineered a 13-microservice multi-agent pipeline using FastMCP tool servers, Redis pub/sub for inter-agent messaging, ChromaDB for persistent memory, and an evaluator-critic orchestration loop. Deployed on Docker + Kubernetes with Arize Phoenix / OpenTelemetry tracing and fault-tolerant design — graceful degradation on agent or Redis failure, LLM-as-judge evaluation across a 20-topic benchmark.',
+        tech: ['FastMCP', 'Redis', 'ChromaDB', 'Docker', 'Kubernetes', 'OpenTelemetry', 'Arize Phoenix', 'LLM-as-Judge'],
+        github: 'https://github.com/Keerthan22-sys/multi-agent-system-a2a-mcp',
+        accent: false,
+    },
+    {
         badge: 'LLM Fine-Tuning',
-        name: 'Fine-Tune with QLoRA — Indian Tax Domain Expert',
-        tagline: 'End-to-end: dataset creation → QLoRA → DPO alignment → RAG → FastAPI',
-        desc: 'Took Llama 3.1 8B and specialised it for Indian Income Tax law using QLoRA (4-bit quantization + LoRA adapters). The pipeline covers supervised fine-tuning, DPO alignment to reduce hallucination, a RAG layer over tax documents, and a FastAPI endpoint for production serving. Model published on HuggingFace. Trains on a free Colab T4.',
+        name: 'Fine-Tune with QLoRA — Domain Expert',
+        tagline: 'Dataset creation → QLoRA → DPO alignment → RAG → FastAPI',
+        desc: 'Took Llama 3.1 8B and specialized it for Indian Income Tax law using QLoRA (4-bit quantization + LoRA adapters). The pipeline covers supervised fine-tuning, DPO alignment to reduce hallucination, a RAG layer over tax documents, and a FastAPI endpoint for production serving. Model published on HuggingFace. Trains on a free Colab T4.',
         tech: ['Python', 'QLoRA', 'Unsloth', 'DPO', 'RAG', 'HuggingFace', 'FastAPI', 'Llama 3.1'],
         github: 'https://github.com/Keerthan22-sys/Fine-Tune-with-QLoRA',
         huggingface: 'https://huggingface.co/keerthan222/indian-tax-expert-llama-3.1-8b-lora',
-        accent: true,
+        accent: false,
     },
     {
         badge: 'AI Agents',
         name: 'Deep Research Assistant',
         tagline: 'Autonomous multi-agent research at web scale',
-        desc: 'A fully autonomous research assistant that plans, searches, and synthesizes information across the web. Built with CrewAI\'s multi-agent framework — one agent decomposes the query, others run parallel searches via Firecrawl, a final agent synthesises a structured report.',
+        desc: "A fully autonomous research assistant that plans, searches, and synthesizes information across the web. Built with CrewAI's multi-agent framework — one agent decomposes the query, others run parallel searches via Firecrawl, a final agent synthesizes a structured report.",
         tech: ['Python', 'CrewAI', 'LangChain', 'OpenAI', 'Firecrawl', 'Streamlit'],
         github: 'https://github.com/Keerthan22-sys/deep_research_app',
-        accent: false,
-    },
-    {
-        badge: 'Agent Infrastructure',
-        name: 'Multi-Agent System — A2A + MCP',
-        tagline: 'Agent coordination using next-gen open protocols',
-        desc: 'Implemented Google\'s Agent-to-Agent (A2A) protocol alongside Anthropic\'s Model Context Protocol (MCP) to enable structured, interoperable communication between autonomous agents. Explores how standardised messaging reduces brittleness in complex AI pipelines.',
-        tech: ['Python', 'A2A Protocol', 'MCP', 'LLM Orchestration'],
-        github: 'https://github.com/Keerthan22-sys/multi-agent-system-a2a-mcp',
-        accent: false,
-    },
-    {
-        badge: 'AI Product',
-        name: 'DevOnboard AI',
-        tagline: 'AI-powered developer onboarding platform',
-        desc: 'A TypeScript platform that uses AI to accelerate developer onboarding — parsing codebases, generating context-aware documentation, and answering questions about unfamiliar repos. Targets the painful first-week experience every engineer faces at a new company.',
-        tech: ['TypeScript', 'Next.js', 'OpenAI', 'RAG', 'Vector DB'],
-        github: 'https://github.com/Keerthan22-sys/DevOnboard_AI',
         accent: false,
     },
 ];
@@ -67,11 +66,10 @@ const Projects = () => {
                 <div className="section-eyebrow">Selected Work</div>
                 <h2 className="section-title">What I've built</h2>
                 <p className="section-lead">
-                    Focused on AI-native products — fine-tuned models, agents that reason,
-                    systems that coordinate, and infrastructure that holds it all together.
+                    Enterprise RAG platforms, multi-agent orchestration, fine-tuned LLMs,
+                    and the infrastructure to run them in production.
                 </p>
 
-                {/* Featured */}
                 <div className="projects-featured">
                     {featured.map((p) => (
                         <div
@@ -115,7 +113,6 @@ const Projects = () => {
                     ))}
                 </div>
 
-                {/* Other notable projects */}
                 <div className="projects-heading-row">
                     <h3>Other notable work</h3>
                     <div className="divider" />
