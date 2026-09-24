@@ -40,7 +40,7 @@ const Footer = () => {
                             <FaTwitter /> @keerthangowdas1
                         </a>
                         <a
-                            href="https://drive.google.com/file/d/1Fo_ODA66Xve9WBEUFX7SfZTsESMSBpNa/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1mRydzKCSWgnh4TOHes1Oq0HyTW2jhgDd/view?usp=sharing"
                             target="_blank"
                             rel="noreferrer"
                         >
